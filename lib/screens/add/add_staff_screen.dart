@@ -61,6 +61,8 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
         'password': _passwordController.text.trim(), // consider hashing
         'profileImage': imageUrl ?? '',
         'createdAt': FieldValue.serverTimestamp(),
+        'status': 'inactive',
+        'joinedIds': [],
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
