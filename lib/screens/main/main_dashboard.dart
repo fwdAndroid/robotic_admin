@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:robotic_admin/screens/main/pages/account_screen.dart';
+import 'package:robotic_admin/screens/main/pages/staff_request_screen.dart';
 import 'package:robotic_admin/screens/main/pages/staff_screen.dart';
 import 'package:robotic_admin/screens/main/pages/user_screen.dart';
 
@@ -19,6 +20,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
   final List<Widget> _screens = [
     StaffScreen(), // Replace with your screen widgets
+    StaffRequestScreen(), // Assuming this is a valid screen
     UserScreen(),
     AccountScreen(),
   ];
@@ -52,6 +54,14 @@ class _MainDashboardState extends State<MainDashboard> {
             BottomNavigationBarItem(
               icon: Icon(Icons.person_2, size: 25, color: Color(0xff0A5EFE)),
               label: "Staff",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.request_page,
+                size: 25,
+                color: Color(0xff0A5EFE),
+              ),
+              label: "Staff Request",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person, size: 25, color: Color(0xff0A5EFE)),
