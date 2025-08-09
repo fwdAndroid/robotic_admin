@@ -25,6 +25,65 @@ class _StaffRequestScreenState extends State<StaffRequestScreen> {
     return 'Unknown';
   }
 
+  // Function to show dialog for new password input
+  Future<void> _changePassword(String staffId, String requestId) async {
+    final TextEditingController passwordController = TextEditingController();
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Change Password'),
+          content: TextField(
+            controller: passwordController,
+            decoration: const InputDecoration(labelText: 'Enter new password'),
+            obscureText: true,
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.pop(context, null),
+            ),
+            ElevatedButton(
+              child: const Text('Update'),
+              onPressed: () {
+                Navigator.pop(context, passwordController.text.trim());
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null && result.isNotEmpty) {
+      try {
+        // 1️⃣ Update staff password
+        await FirebaseFirestore.instance
+            .collection('staff')
+            .doc(staffId)
+            .update({'password': result});
+
+        // 2️⃣ Update request status
+        await FirebaseFirestore.instance
+            .collection('password_requests')
+            .doc(requestId)
+            .update({'status': 'done'});
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Password updated successfully')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,8 +109,8 @@ class _StaffRequestScreenState extends State<StaffRequestScreen> {
           return ListView.builder(
             itemCount: requests.length,
             itemBuilder: (context, index) {
-              final requestData =
-                  requests[index].data() as Map<String, dynamic>;
+              final requestDoc = requests[index];
+              final requestData = requestDoc.data() as Map<String, dynamic>;
 
               final staffId = requestData['staffId'] as String?;
               final email = requestData['email'] ?? 'No Email';
@@ -72,6 +131,15 @@ class _StaffRequestScreenState extends State<StaffRequestScreen> {
                       children: [
                         Text('Staff Name: $staffName'),
                         Text('Status: $status'),
+                        if (status == 'pending')
+                          TextButton(
+                            onPressed: () {
+                              if (staffId != null) {
+                                _changePassword(staffId, requestDoc.id);
+                              }
+                            },
+                            child: const Text("Change Password"),
+                          ),
                       ],
                     ),
                     isThreeLine: true,
