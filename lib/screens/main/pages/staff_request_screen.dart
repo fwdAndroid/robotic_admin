@@ -94,6 +94,7 @@ class _StaffRequestScreenState extends State<StaffRequestScreen> {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('password_requests')
+            .where("status", isEqualTo: "pending")
             .orderBy('timestamp', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
